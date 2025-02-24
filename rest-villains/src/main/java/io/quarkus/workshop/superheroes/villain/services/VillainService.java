@@ -2,14 +2,18 @@ package io.quarkus.workshop.superheroes.villain.services;
 
 import java.util.List;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
 import io.quarkus.workshop.superheroes.villain.model.Villain;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 import static jakarta.transaction.Transactional.TxType.SUPPORTS;
 
+@ApplicationScoped
 public class VillainService {
-
+    @ConfigProperty(name = "level.multiplier", defaultValue="1.0") double levelMultiplier;
     @Transactional(SUPPORTS)
     public List<Villain> findAllVillains() {
         return Villain.listAll();
@@ -28,8 +32,9 @@ public class VillainService {
         }
         return randomVillain;
     }
-
+    @Transactional
     public Villain persistVillain(@Valid Villain villain) {
+        villain.level = (int) Math.round(villain.level * levelMultiplier);
         villain.persist();
         return villain;
     }

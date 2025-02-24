@@ -5,9 +5,11 @@ import java.util.Random;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.smallrye.common.constraint.NotNull;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 
+@Entity
 public class Villain extends PanacheEntity {
     @NotNull
     @Size(min=3, max = 50)

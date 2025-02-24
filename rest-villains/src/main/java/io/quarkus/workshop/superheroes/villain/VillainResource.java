@@ -10,13 +10,12 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
-import org.jboss.resteasy.reactive.RestPath;
-import org.jboss.resteasy.reactive.RestResponse;
+
 
 
 import java.util.List;
@@ -25,6 +24,7 @@ import org.jboss.logging.Logger;
 
 @Path("/api/villains")
 public class VillainResource {
+
     Logger logger;
     VillainService service;
 
@@ -34,58 +34,57 @@ public class VillainResource {
         this.logger = logger;
     }
 
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String hello() {
-        return "Hello RESTEasy";
-    }
 
     @GET
     @Path("random")
-    public RestResponse<Villain> getRandomVillain() {
+    public Response getRandomVillain() {
         Villain villain = service.findRandoVillain();
         logger.debug("Found random villain " + villain);
-        return RestResponse.ok(villain);
+        return Response.ok(villain).build();
     }
 
     @GET
-    public RestResponse<List<Villain>> getAllVillains() {
+    public Response getAllVillains() {
         List<Villain> villains = service.findAllVillains(); // Pass an appropriate long argument
         logger.debug("Total number of villains " + villains.size());
-        return RestResponse.ok(villains);
+        return Response.ok(villains).build();
     }
+
     @GET
-    public RestResponse<Villain> getVillain(@RestPath Long id) {
+    @Path("/{id}")
+    public Response getVillain(@PathParam("id") Long id) {
         Villain villain = service.findVillainById(id);
+
         if (villain != null) {
             logger.debug("Found villain " + villain);
-            return RestResponse.ok(villain);
+            return Response.ok(villain).build();
         } else {
             logger.debug("No villain found with id " + id);
-            return RestResponse.noContent();
+            return Response.noContent().build();
         }
     }
 
     @POST
-    public RestResponse<Void> createVillain(@Valid Villain villain, @Context UriInfo uriInfo) {
+    public Response createVillain(@Valid Villain villain, @Context UriInfo uriInfo) {
         villain = service.persistVillain(villain);
         UriBuilder builder = uriInfo.getAbsolutePathBuilder().path(Long.toString(villain.id));
         logger.debug("New villain created with URI " + builder.build().toString());
 
-        return RestResponse.created(builder.build());
+        return Response.created(builder.build()).entity(villain).build();
     }
 
     @PUT
-    public RestResponse<Villain> updateVillain(@Valid Villain villain) {
+    public Response updateVillain(@Valid Villain villain) {
         villain = service.updateVillain(villain);
         logger.debug(("Villain updated with new valued " + villain));
-        return RestResponse.ok(villain);
+        return Response.ok(villain).build();
     }
     @DELETE
     @Path("/{id}")
-    public RestResponse<Void> deleteVillain(@RestPath long id) {
+    public Response deleteVillain(@PathParam("id") Long id) {
+
         service.deleteVillain(id);
         logger.debug("Villain deleted with " + id);
-        return RestResponse.noContent();
+        return Response.noContent().build();
     }
 }
