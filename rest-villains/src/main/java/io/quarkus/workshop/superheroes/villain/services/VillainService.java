@@ -6,13 +6,12 @@ import io.quarkus.workshop.superheroes.villain.model.Villain;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
-import static jakarta.transaction.Transactional.TxType.REQUIRED;
 import static jakarta.transaction.Transactional.TxType.SUPPORTS;
 
 public class VillainService {
 
     @Transactional(SUPPORTS)
-    public List<Villain> findAllVillains(long id) {
+    public List<Villain> findAllVillains() {
         return Villain.listAll();
     }
 
